@@ -314,12 +314,52 @@ class SearchController extends Controller
        
        return $data = 1;
     }
+
+    public function add_line(Request $request) {
+        $query = $request->get('term','');
+        
+
+        DB::table('lines')->insert(
+    ['name' => $query, 'dept_id' => session('dept_id'), 'added_by' => session('user_id')]
+);
+        
+       
+       return $data = 1;
+    }
+
+    public function add_product(Request $request) {
+        $query = $request->get('term','');
+        
+
+        DB::table('products')->insert(
+    ['name' => $query, 'dept_id' => session('dept_id'), 'added_by' => session('user_id')]
+);
+        
+       
+       return $data = 1;
+    }
     
       public function del_wrkstation(Request $request) {
         $query = $request->get('term','');
 
        $wrkstation= Wrkstation::find($query);
        $wrkstation->delete();
+       
+       return $data = 1;
+    }
+
+    public function del_line(Request $request) {
+        $query = $request->get('term','');
+
+       DB::table('lines')->where('id',$query)->delete();
+       
+       return $data = 1;
+    }
+
+    public function del_product(Request $request) {
+        $query = $request->get('term','');
+
+       DB::table('products')->where('id',$query)->delete();
        
        return $data = 1;
     }

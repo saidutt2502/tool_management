@@ -48,15 +48,33 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="start_date" class="col-md-4 control-label">Line</label>
+
+                            <div class="col-md-6">
+                                <input autocomplete="off" id="line" type="text" class="form-control" name="line"  value="{{$line}}" disabled >
+                                 <input  type="hidden"  name="selected_line" value="{{$lineid}}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="start_date" class="col-md-4 control-label">Product</label>
+
+                            <div class="col-md-6">
+                                <input autocomplete="off" id="line" type="text" class="form-control" name="product"  value="{{$product}}" disabled >
+                                 <input  type="hidden"  name="selected_product" value="{{$productid}}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <div class="col-md-6 col-md-offset-6">
                             <br>
                                 <button type="submit" class="btn btn-primary ">
                                     Issue
                                 </button>
                                 
-                                <button type="reset" id="reset" class="btn btn-danger ">
+                                <!-- <button type="reset" id="reset" class="btn btn-danger ">
                                     Reset
-                                </button>
+                                </button> -->
                             </div>
                         </div>
                    </form>

@@ -82,7 +82,10 @@ Route::get('stock_tool', 'ToolController@stock_tool');
 //Custom Functions in Admin Controller
 Route::post('issue_report', 'AdminController@issue_report');
 Route::post('return_report', 'AdminController@return_report');
+Route::post('toolwise_report', 'AdminController@toolwise_report');
 Route::get('wrk_station', 'AdminController@wrk_station');
+Route::get('lines', 'AdminController@lines');
+Route::get('products', 'AdminController@products');
 Route::get('list_admins', 'AdminController@list_admins');
 Route::get('stock_history', 'AdminController@stock_history');
 Route::post('add_supervisor', 'AdminController@add_supervisor');
@@ -93,6 +96,10 @@ Route::get('issue_tool_report', function(){
 
 Route::get('return_tool_report', function(){
     return View('admin.return_report');
+});
+
+Route::get('tool_wise_report', function(){
+    return View('admin.toolwise_report');
 });
     
             
@@ -123,7 +130,11 @@ Route::post('update_tool','SearchController@update_tool');
 Route::post('delete_tool','SearchController@delete_tool');
 Route::post('update_stock','SearchController@update_stock');
 Route::get('add_wrkstation','SearchController@add_wrkstation');
+Route::get('add_line','SearchController@add_line');
+Route::get('add_product','SearchController@add_product');
 Route::post('del_wrkstation','SearchController@del_wrkstation');
+Route::post('del_line','SearchController@del_line');
+Route::post('del_product','SearchController@del_product');
 
 //Machine Breakdown Intimation
 

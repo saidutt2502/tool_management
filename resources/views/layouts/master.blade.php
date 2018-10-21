@@ -160,7 +160,7 @@ $m_sup=User::where('id',$u2d->user_id)->first();
                     <ul class="nav child_menu">
                     <li><a href="/tool/create">Add Tools</a></li>
             <li><a href="/tool">View/Update Tools</a></li>
-                      <li><a href="/sup_issue">Issue Tools</a></li>
+                      <!-- <li><a href="/sup_issue">Issue Tools</a></li> -->
                       <li><a href="/sup_return">Return Tools</a></li>
                     </ul>
                   </li>
@@ -177,8 +177,11 @@ $m_sup=User::where('id',$u2d->user_id)->first();
                     </ul>
                   </li>
             <li><a href="wrk_station"><i class="fa fa-recycle"></i> Manage Workstations </a></li>
+            <li><a href="lines"><i class="glyphicon glyphicon-film"></i> Manage Lines </a></li>
+            <li><a href="products"><i class="glyphicon glyphicon-barcode"></i> Manage Products </a></li>
                   <li id="tools_li"><a><i class="fa fa-clone"></i>Tools Reports <span class="fa fa-chevron-down"></span></a>
                     <ul id="tools_ul" class="nav child_menu">
+                      <li><a href="tool_wise_report">Tool Wise</a></li>
                       <li id="return_link"><a href="return_tool_report">Return</a></li>
                       <li id="issue_link"><a href="issue_tool_report">Issue</a></li>
             <li><a href="/stock_history">Stock History</a></li>
@@ -198,7 +201,7 @@ $m_sup=User::where('id',$u2d->user_id)->first();
           </div>
         </li>
         <li><a href="/sup_return"><i class="fa fa-external-link-square"></i> Return Tool </a></li>
-        <li><a href="/sup_issue"><i class="fa fa-gavel"></i> Issue Tool </a></li>
+        <!-- <li><a href="/sup_issue"><i class="fa fa-gavel"></i> Issue Tool </a></li> -->
         <li><a href="/stock_tool"><i class="fa fa-area-chart"></i> View Stock</a></li>
 
         <li><a><i class="fa fa-exclamation"></i> Breakdown Intimation <span class="fa fa-chevron-down"></span></a> <!-- copy this -->

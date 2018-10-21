@@ -21,6 +21,8 @@ class CreateReturnsTable extends Migration
             $table->integer('dept_id');
             $table->integer('shift_id');
             $table->integer('wrk_station_id');
+            $table->integer('line_id')->nullable();
+            $table->integer('product_id')->nullable();
             $table->string('remarks')->nullable();	
             $table->date('return_date');	
         });

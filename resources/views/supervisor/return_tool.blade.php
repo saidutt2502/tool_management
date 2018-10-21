@@ -3,65 +3,121 @@
 @section('header')Return Tools @endsection
 @section('body')
             <div class="panel panel-default">
-
+                <br>
+                <button type="button" class="btn btn-primary btn-md" style="float:right" id="add" >&nbsp&nbsp+&nbsp&nbsp</button><br>
+                 
                 <div class="panel-body">
-				<br>
+				
                     <form class="form-horizontal" method="POST" action="return_tool">
                         {{ csrf_field() }}
 
-                     
-						 <div class="form-group">
-                            <label for="sch_type" class="col-md-4 control-label">Tool Name</label>
-							<div class="col-md-6">
-                           <input autocomplete="off" id="search_text" type="text" class="form-control" name="name" value="{{ old('name') }}" required autofocus>
-								<input id="selected_tool" type="hidden"  name="selected_tool" value="">
-								</div>
-                        </div>
-						
-							<div class="form-group">
-                            <label for="start_date" class="col-md-4 control-label">Tool Quantity</label>
 
-                            <div class="col-md-6">
-                                <input autocomplete="off" id="tl_qty" type="text" class="form-control" name="tl_qty" >
-                            </div>
-                        </div>
+            <div class="form-group" id="add_tool" >
+              <div class="col-md-12" style="margin-bottom: -18px;">
+                <div class="col-md-5">
+                 <label for="sch_type" class="control-label">Tool Name*</label>
+                            
+                           <input autocomplete="off" id="search_text" type="text" class="form-control" name="name" required autofocus>
+                          <input id="selected_tool" type="hidden"  name="selected_tool" value="">
+                    </div>
 
-                        	<div class="form-group">
-                            <label for="start_date" class="col-md-4 control-label">Shift Number</label>
+                     <div class="col-md-5">
+                     <label for="start_date" class="control-label">Tool Quantity*</label>
 
-                            <div class="col-md-6">
-                                <input autocomplete="off"  id="sh_number" type="text" class="form-control" name="sh_number" >
-                            </div>
-                        </div>
-						
-						<div class="form-group">
-                            <label for="sch_type" class="col-md-4 control-label">Workstation</label>
+                         
+                                <input autocomplete="off" id="tl_qty" type="text" class="form-control" name="tl_qty" required><br> 
+                   </div>
+                 </div>
+               </div>
 
-                            <div class="col-md-6">
-							<?php 
-								
-								use App\Wrkstation;
-								//list of workstations assigned to that department
-									$wrk_station = Wrkstation::where('dept_id','=' ,session('dept_id'))->get();
 
-								
-							?>
+                    <div class="form-group">
+                        <div class="col-md-12" style="margin-bottom: -18px;">
+                        
+                        <div class="col-md-5">
+                        
+                            <label for="sch_type" class="control-label">Workstation*</label>
+
+                            
+                            <?php 
+                                
+                                use App\Wrkstation;
+                                //list of workstations assigned to that department
+                                    $wrk_station = Wrkstation::where('dept_id','=' ,session('dept_id'))->get();
+
+                                
+                            ?>
                                <select  id="wrk_st"  class="form-control" name="wrk_st"  required>
-                                <option selected="true" disabled="true">Select Workstation</option>
-							   @foreach($wrk_station as $wk_sst)
-							   <option value="{{$wk_sst->id}}">{{$wk_sst->name}}</option>
-							   @endforeach
-								</select>
+                               @foreach($wrk_station as $wk_sst)
+                               <option value="{{$wk_sst->id}}">{{$wk_sst->name}}</option>
+                               @endforeach
+                                </select>
+                            
+                        </div>
+                    
+
+                        	 <div class="col-md-5">
+                            <label for="start_date" class="control-label">Shift Number*</label>
+
+                            
+                                <input autocomplete="off"  id="sh_number" type="text" class="form-control" name="sh_number" required>
+                            
+                        </div>
+                    </div>
+                </div><br>
+						
+						
+
+                        <div class="form-group">
+                             <div class="col-md-12" style="margin-bottom: -18px;">
+                                <div class="col-md-5">
+                            <label for="sch_type" class="control-label">Line*</label>
+
+                            
+                            <?php 
+                                
+                                    $lines = DB::table('lines')->where('dept_id','=' ,session('dept_id'))->get();
+
+                                
+                            ?>
+                               <select  id="wrk_st"  class="form-control" name="line" required>
+                                <option value="0">No Line</option>
+                               @foreach($lines as $line)
+                               <option value="{{$line->id}}">{{$line->name}}</option>
+                               @endforeach
+                                </select>
+                            </div>
+                        
+                            <div class="col-md-5">
+                            <label for="sch_type" class=" control-label">Product*</label>
+
+                           
+                            <?php 
+                                
+                                    $products = DB::table('products')->where('dept_id','=' ,session('dept_id'))->get();
+
+                                
+                            ?>
+                               <select  id="wrk_st"  class="form-control" name="product" required>
+                                <option value="0">No Product</option>
+                               @foreach($products as $product)
+                               <option value="{{$product->id}}">{{$product->name}}</option>
+                               @endforeach
+                                </select>
                             </div>
                         </div>
+                    </div><br>
 
 						
 						<div class="form-group">
-                            <label for="start_date" class="col-md-4 control-label">Remarks</label>
+                            <div class="col-md-12" style="margin-bottom: -18px;">
+                            <div class="col-md-10">
+                            <label for="start_date" class="control-label">Remarks</label>
 
-                            <div class="col-md-6">
+                            
                                 <textarea autocomplete="off" id="remark"  class="form-control" name="remark" ></textarea>
                             </div>
+                        </div>
                         </div>
 
                         <div class="form-group">
@@ -139,6 +195,30 @@
 						  
 	  
 			});
+
+
+$('#add').click(function(){
+
+
+
+$('#add_tool').append('<div class="col-md-12 remove"><div class="col-md-5"><label for="sch_type" class="control-label">Tool Name*</label><input autocomplete="off" id="search_text" type="text" class="form-control" name="name" required autofocus><input id="selected_tool" type="hidden"  name="selected_tool" value=""></div><div class="col-md-5"><label for="start_date" class="control-label">Tool Quantity*</label><input autocomplete="off" id="tl_qty" type="text" class="form-control" name="tl_qty" required></div><div class="col-md-2"><br><button type="button" class="btn btn-sm btn-danger del_btn">-</button></div></div>');
+
+$('.del_btn').click(function(){
+$(this).parent().parent().remove();
+});
+
+
+
+    $('#reset').click(function()
+{
+   $(".remove").remove();
+     
+
+});
+
+
+
+});
 			
 
 	});

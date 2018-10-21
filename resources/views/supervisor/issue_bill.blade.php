@@ -24,7 +24,7 @@
 	<div class="panel-body">
 	<h4>
 		<div class="row">
-			<div class="col-md-5 col-md-offset-1">Name:&nbsp;&nbsp;<b>
+			<div class="col-md-8 col-md-offset-1">Name:&nbsp;&nbsp;<b>
 			{{$this_bill->user_name}} </b>
 			</div>    
 		</div>
@@ -34,7 +34,7 @@
 				Employee ID:&nbsp&nbsp<strong>{{$this_bill->code}}</strong>
 			</div>            
 			
-			<div class="col-md-5">
+			<div class="col-md-6">
 				<span class="pull-right">&nbsp;&nbsp; <strong> {{ session('dept_name') }}</b>
 				</strong> </span>
 			</div> 
@@ -49,20 +49,46 @@
 			<span class="pull-right">Quantity:&nbsp&nbsp<strong>{{ $this_bill->qty }}</strong></span>
 		</div> 
 	</div>
+ 
+    <br>
+ 
+	<div class="row">
+		<div class="col-md-8 col-md-offset-1">
+			Shift ID : {{ $this_bill->shift_id }}
+		</div>
+	</div>
 	
 	<br>
 
 	<div class="row">
 		<div class="col-md-8 col-md-offset-1">Workstation: {{ $this_bill->wrk_station_name }}</div>
 	</div>
-	
+
 	<br>
-	
-	<div class="row">
-		<div class="col-md-8 col-md-offset-1">
-			Shift ID : {{ $this_bill->shift_id }}
-		</div>
+    @if($this_bill->line_id==0)
+    <div class="row">
+		<div class="col-md-8 col-md-offset-1">Line: No Line</div>
 	</div>
+    @else
+	<div class="row">
+		<div class="col-md-8 col-md-offset-1">Line: {{ $this_bill->line_name }}</div>
+	</div>
+	@endif
+
+	<br>
+    @if($this_bill->product_id==0)
+    <div class="row">
+		<div class="col-md-8 col-md-offset-1">Product: No Product</div>
+	</div>
+    @else
+	<div class="row">
+		<div class="col-md-8 col-md-offset-1">Product: {{ $this_bill->product_name }}</div>
+	</div>
+	@endif
+	
+
+	
+	
 
 	<hr>
 	<center>

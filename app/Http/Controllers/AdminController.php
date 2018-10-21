@@ -93,7 +93,7 @@ class AdminController extends Controller
                ->orderBy('issue_date', 'desc')
                ->get(); */
 			   
-	 	$issues = Issue_tool::select('issues.id', 'users.name as user_name', 'tools.name as tool_name','issues.tool_qty','issues.shift_id', 							'workstations.name as wk_name','issues.issue_date as date') 
+	 	$issues = Issue_tool::select('issues.id', 'users.name as user_name', 'tools.name as tool_name','issues.tool_qty','issues.shift_id', 'workstations.name as wk_name','issues.issue_date as date','issues.line_id as lineid','issues.product_id as productid') 
 				->join('users', 'users.id', '=', 'issues.user_id')
 				->join('tools', 'tools.id', '=', 'issues.tool_id')
 				->join('department', 'department.id', '=', 'issues.dept_id')
@@ -109,7 +109,7 @@ class AdminController extends Controller
 	
 	public function return_report(Request $request)
     {
-		$returns = Return_tool::select('returns.id', 'users.name as user_name', 'tools.name as tool_name','returns.tool_qty','returns.shift_id', 							'workstations.name as wk_name','returns.return_date as date','returns.remarks as remarks') 
+		$returns = Return_tool::select('returns.id', 'users.name as user_name', 'tools.name as tool_name','returns.tool_qty','returns.shift_id','workstations.name as wk_name','returns.return_date as date','returns.remarks as remarks') 
 				->join('users', 'users.id', '=', 'returns.user_id')
 				->join('tools', 'tools.id', '=', 'returns.tool_id')
 				->join('department', 'department.id', '=', 'returns.dept_id')
@@ -120,6 +120,35 @@ class AdminController extends Controller
 				->get();
 			   
 		return view('admin.generated_return')->withReturn($returns); 
+		
+    }
+
+    public function toolwise_report(Request $request)
+    {
+			   
+	 	$toolwise = Issue_tool::select('issues.id', 'users.name as user_name', 'tools.name as tool_name','issues.tool_qty','issues.shift_id','workstations.name as wk_name','issues.issue_date as date','issues.line_id as lineid','issues.product_id as productid') 
+				->join('users', 'users.id', '=', 'issues.user_id')
+				->join('tools', 'tools.id', '=', 'issues.tool_id')
+				->join('department', 'department.id', '=', 'issues.dept_id')
+				->join('workstations', 'workstations.id', '=', 'issues.wrk_station_id')
+				->where('issues.dept_id','=',session('dept_id'))
+				->where('issues.tool_id','=',$request->selected_tool)
+				->where('issues.line_id','=',$request->line)
+				->whereBetween('issue_date', [$request->f_date,$request->t_date])
+				->orderBy('date', 'desc')
+				->get();
+		$quantity = Issue_tool::select('issues.id', 'users.name as user_name', 'tools.name as tool_name','issues.tool_qty','issues.shift_id','workstations.name as wk_name','issues.issue_date as date','issues.line_id as lineid','issues.product_id as productid') 
+				->join('users', 'users.id', '=', 'issues.user_id')
+				->join('tools', 'tools.id', '=', 'issues.tool_id')
+				->join('department', 'department.id', '=', 'issues.dept_id')
+				->join('workstations', 'workstations.id', '=', 'issues.wrk_station_id')
+				->where('issues.dept_id','=',session('dept_id'))
+				->where('issues.tool_id','=',$request->selected_tool)
+				->where('issues.line_id','=',$request->line)
+				->whereBetween('issue_date', [$request->f_date,$request->t_date])
+				->sum('tool_qty');		
+			   
+		return view('admin.generated_toolwise')->withToolwise($toolwise)->withTotal($quantity); 
 		
     }
 	
@@ -133,6 +162,29 @@ class AdminController extends Controller
 		return view('admin.wrk_station')->withStation($wrkstation); 
 		
     }
+
+    public function lines()
+    {
+		$lines = DB::table('lines')->select('lines.id as id','lines.name as name','users.name as user_name')
+				->join('users', 'users.id', '=', 'lines.added_by')
+				->where('lines.dept_id','=',session('dept_id'))
+				->get();
+			   
+		return view('admin.lines')->withLine($lines); 
+		
+    }
+
+     public function products()
+    {
+		$products = DB::table('products')->select('products.id as id','products.name as name','users.name as user_name')
+				->join('users', 'users.id', '=', 'products.added_by')
+				->where('products.dept_id','=',session('dept_id'))
+				->get();
+			   
+		return view('admin.products')->withProduct($products); 
+		
+    }
+
 	
 	public function list_admins()
     {

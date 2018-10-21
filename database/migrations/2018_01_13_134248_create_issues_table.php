@@ -21,6 +21,8 @@ class CreateIssuesTable extends Migration
 			 $table->integer('tool_qty');
             $table->integer('shift_id');
             $table->integer('wrk_station_id');
+            $table->integer('line_id')->nullable();
+            $table->integer('product_id')->nullable();
             $table->integer('intimation_id');	
             $table->date('issue_date');	
         });

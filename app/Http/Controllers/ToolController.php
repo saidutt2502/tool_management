@@ -137,27 +137,54 @@ class ToolController extends Controller
 	
 	public function return_tool(Request $request)
     {
+
 		
 		$user = Auth::user();
 		$user_type = $user->user_type;
-		
-      $return_entry = new Return_tool;
-	  
-	  $return_entry->user_id=session('user_id');
-	  $return_entry->tool_id=$request->selected_tool;
-	  $return_entry->dept_id=session('dept_id');
-	  $return_entry->tool_qty=$request->tl_qty;
-	  $return_entry->shift_id=$request->sh_number;
-	  $return_entry->wrk_station_id=$request->wrk_st;
-	  $return_entry->remarks=$request->remark;
-	  $return_entry->return_date=Carbon::today();
-	
-		$return_entry->save();
 
+		$entry_id = DB::table('returns')->insertGetId(
+    [ 'user_id' => session('user_id'), 'tool_id' => $request->selected_tool, 'dept_id' => session('dept_id'), 'tool_qty' => $request->tl_qty, 'shift_id' => $request->sh_number, 'wrk_station_id' => $request->wrk_st, 'line_id' => $request->line, 'product_id' => $request->product, 'remarks' => $request->remark, 'return_date' => Carbon::today() ]
+);
+		
+      
+
+        $first_time=Issue_tool::where('tool_id',$request->selected_tool)->count();
+
+        if($first_time=='0')
+        {
+             DB::table('returns')->where('id',$entry_id)->delete();
+        }
 
 		$tool=Tool::where('id','=',$request->selected_tool)->first();
 		$workstations=Wrkstation::where('id','=',$request->wrk_st)->first();
-		return view('supervisor.issue_tool')->withToolname($tool->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($request->selected_tool)->withWorkstationid($request->wrk_st);
+		$lines=DB::table('lines')->where('id','=',$request->line)->first();
+		$products=DB::table('products')->where('id','=',$request->product)->first();
+
+		if($request->product=='0')
+		{
+			if($request->line=='0')
+		{
+			return view('supervisor.issue_tool')->withToolname($tool->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($request->selected_tool)->withWorkstationid($request->wrk_st)->withLine('No Line')->withLineid('0')->withProduct('No Product')->withProductid('0');
+		}
+	    else
+	    {
+	    	return view('supervisor.issue_tool')->withToolname($tool->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($request->selected_tool)->withWorkstationid($request->wrk_st)->withLine($lines->name)->withLineid($request->line)->withProduct('No Product')->withProductid('0');
+	    }
+		}
+		else
+		{
+			if($request->line=='0')
+		{
+			return view('supervisor.issue_tool')->withToolname($tool->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($request->selected_tool)->withWorkstationid($request->wrk_st)->withLine('No Line')->withLineid('0')->withProduct($products->name)->withProductid($request->product);
+		}
+	    else
+	    {
+	    	return view('supervisor.issue_tool')->withToolname($tool->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($request->selected_tool)->withWorkstationid($request->wrk_st)->withLine($lines->name)->withLineid($request->line)->withProduct($products->name)->withProductid($request->product);
+	    }
+		}
+
+		
+		
 			
 		
     }
@@ -177,6 +204,8 @@ class ToolController extends Controller
 	  $issue_entry->tool_qty=$request->selected_quantity;
 	  $issue_entry->shift_id=$request->selected_shnumber;
 	  $issue_entry->wrk_station_id=$request->selected_wrkst;
+	  $issue_entry->line_id=$request->selected_line;
+	  $issue_entry->product_id=$request->selected_product;
 	  $issue_entry->issue_date=Carbon::today();
 	  $issue_entry->save();
 	  
@@ -188,14 +217,60 @@ class ToolController extends Controller
 		
 		$tool_issued->available -= $request->selected_quantity;
 		$tool_issued->save();
-		
-		$issue_bill = Issue_tool::select('users.name as user_name','users.emp_code as code',  'user_details.contact_number as number','tools.name as tool_name','tools.tool_code as tool_code','workstations.name as wrk_station_name','issues.id as id','issues.tool_qty as qty','issues.shift_id as shift_id,issues.issue_date as date') 
+
+		if($request->selected_product=='0')
+		{
+			if($request->selected_line=='0')
+		{
+			$issue_bill = Issue_tool::select('users.name as user_name','users.emp_code as code',  'user_details.contact_number as number','tools.name as tool_name','tools.tool_code as tool_code','workstations.name as wrk_station_name','issues.id as id','issues.tool_qty as qty','issues.shift_id as shift_id','issues.issue_date as date','issues.line_id as line_id','issues.product_id as product_id') 
 			->join('users', 'users.id', '=', 'issues.user_id')
 			->join('user_details', 'user_details.user_id', '=', 'issues.user_id')
 			->join('tools', 'tools.id', '=', 'issues.tool_id')
 			->join('workstations', 'workstations.id', '=','issues.wrk_station_id')
 			->where('issues.id','=',$id)
 			->get();
+		}
+	    else
+	    {
+	    	$issue_bill = Issue_tool::select('users.name as user_name','users.emp_code as code',  'user_details.contact_number as number','tools.name as tool_name','tools.tool_code as tool_code','workstations.name as wrk_station_name','issues.id as id','issues.tool_qty as qty','issues.shift_id as shift_id','issues.issue_date as date','lines.name as line_name','issues.line_id as line_id','issues.product_id as product_id') 
+			->join('users', 'users.id', '=', 'issues.user_id')
+			->join('user_details', 'user_details.user_id', '=', 'issues.user_id')
+			->join('tools', 'tools.id', '=', 'issues.tool_id')
+			->join('workstations', 'workstations.id', '=','issues.wrk_station_id')
+			->join('lines', 'lines.id', '=','issues.line_id')
+			->where('issues.id','=',$id)
+			->get();
+	    }
+		}
+		else
+		{
+				if($request->selected_line=='0')
+		{
+			$issue_bill = Issue_tool::select('users.name as user_name','users.emp_code as code',  'user_details.contact_number as number','tools.name as tool_name','tools.tool_code as tool_code','workstations.name as wrk_station_name','issues.id as id','issues.tool_qty as qty','issues.shift_id as shift_id','issues.issue_date as date','issues.line_id as line_id','issues.product_id as product_id','products.name as product_name') 
+			->join('users', 'users.id', '=', 'issues.user_id')
+			->join('user_details', 'user_details.user_id', '=', 'issues.user_id')
+			->join('tools', 'tools.id', '=', 'issues.tool_id')
+			->join('workstations', 'workstations.id', '=','issues.wrk_station_id')
+			->join('products', 'products.id', '=','issues.product_id')
+			->where('issues.id','=',$id)
+			->get();
+		}
+	    else
+	    {
+	    	$issue_bill = Issue_tool::select('users.name as user_name','users.emp_code as code',  'user_details.contact_number as number','tools.name as tool_name','tools.tool_code as tool_code','workstations.name as wrk_station_name','issues.id as id','issues.tool_qty as qty','issues.shift_id as shift_id','issues.issue_date as date','lines.name as line_name','issues.line_id as line_id','issues.product_id as product_id','products.name as product_name') 
+			->join('users', 'users.id', '=', 'issues.user_id')
+			->join('user_details', 'user_details.user_id', '=', 'issues.user_id')
+			->join('tools', 'tools.id', '=', 'issues.tool_id')
+			->join('workstations', 'workstations.id', '=','issues.wrk_station_id')
+			->join('lines', 'lines.id', '=','issues.line_id')
+			->join('products', 'products.id', '=','issues.product_id')
+			->where('issues.id','=',$id)
+			->get();
+	    }
+		}
+		
+		
+		
 			
 		$tool_mail = Tool::find($request->selected_tool);
 		
