@@ -141,21 +141,31 @@ class ToolController extends Controller
 		
 		$user = Auth::user();
 		$user_type = $user->user_type;
+		$selected_tool = array();
 
-		$entry_id = DB::table('returns')->insertGetId(
-    [ 'user_id' => session('user_id'), 'tool_id' => $request->selected_tool, 'dept_id' => session('dept_id'), 'tool_qty' => $request->tl_qty, 'shift_id' => $request->sh_number, 'wrk_station_id' => $request->wrk_st, 'line_id' => $request->line, 'product_id' => $request->product, 'remarks' => $request->remark, 'return_date' => Carbon::today() ]
-);
-		
-      
 
-        $first_time=Issue_tool::where('tool_id',$request->selected_tool)->count();
+		//Running for loop to get IDs of all the Tools
+		foreach($request->name as $each_tool){
+			$tools=Tool::where('name',$each_tool)->first();
+			$tools->id;
+			array_push($selected_tool,$tools->id);
+		}
 
-        if($first_time=='0')
-        {
-             DB::table('returns')->where('id',$entry_id)->delete();
-        }
+		//Inserting the tool's in returns tables
+		foreach($selected_tool as $key => $value){
 
-		$tool=Tool::where('id','=',$request->selected_tool)->first();
+			$entry_id = DB::table('returns')->insertGetId(
+				[ 'user_id' => session('user_id'), 'tool_id' => $value, 'dept_id' => session('dept_id'), 'tool_qty' => $request->tl_qty[$key], 'shift_id' => $request->sh_number, 'wrk_station_id' => $request->wrk_st, 'line_id' => $request->line, 'product_id' => $request->product, 'remarks' => $request->remark, 'return_date' => Carbon::today() ]);
+					
+				
+				$first_time=Issue_tool::where('tool_id',$value)->count();
+				
+				if($first_time=='0'){
+						 DB::table('returns')->where('id',$entry_id)->delete();
+					}
+
+		}
+ 
 		$workstations=Wrkstation::where('id','=',$request->wrk_st)->first();
 		$lines=DB::table('lines')->where('id','=',$request->line)->first();
 		$products=DB::table('products')->where('id','=',$request->product)->first();
@@ -164,26 +174,26 @@ class ToolController extends Controller
 		{
 			if($request->line=='0')
 		{
-			return view('supervisor.issue_tool')->withToolname($tool->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($request->selected_tool)->withWorkstationid($request->wrk_st)->withLine('No Line')->withLineid('0')->withProduct('No Product')->withProductid('0');
+			return view('supervisor.issue_tool')->withToolname($request->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($selected_tool)->withWorkstationid($request->wrk_st)->withLine('No Line')->withLineid('0')->withProduct('No Product')->withProductid('0');
 		}
 	    else
 	    {
-	    	return view('supervisor.issue_tool')->withToolname($tool->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($request->selected_tool)->withWorkstationid($request->wrk_st)->withLine($lines->name)->withLineid($request->line)->withProduct('No Product')->withProductid('0');
+	    	return view('supervisor.issue_tool')->withToolname($request->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($selected_tool)->withWorkstationid($request->wrk_st)->withLine($lines->name)->withLineid($request->line)->withProduct('No Product')->withProductid('0');
 	    }
 		}
 		else
 		{
 			if($request->line=='0')
 		{
-			return view('supervisor.issue_tool')->withToolname($tool->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($request->selected_tool)->withWorkstationid($request->wrk_st)->withLine('No Line')->withLineid('0')->withProduct($products->name)->withProductid($request->product);
+			return view('supervisor.issue_tool')->withToolname($request->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($selected_tool)->withWorkstationid($request->wrk_st)->withLine('No Line')->withLineid('0')->withProduct($products->name)->withProductid($request->product);
 		}
 	    else
 	    {
-	    	return view('supervisor.issue_tool')->withToolname($tool->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($request->selected_tool)->withWorkstationid($request->wrk_st)->withLine($lines->name)->withLineid($request->line)->withProduct($products->name)->withProductid($request->product);
+	    	return view('supervisor.issue_tool')->withToolname($request->name)->withQuantity($request->tl_qty)->withShift($request->sh_number)->withWorkstation($workstations->name)->withToolid($selected_tool)->withWorkstationid($request->wrk_st)->withLine($lines->name)->withLineid($request->line)->withProduct($products->name)->withProductid($request->product);
 	    }
-		}
+		} 
 
-		
+		 
 		
 			
 		
@@ -193,31 +203,60 @@ class ToolController extends Controller
 	public function issue_tool(Request $request)
     {
 		
-			$user = Auth::user();
+		$user = Auth::user();
 		$user_type = $user->user_type;
 		
-      $issue_entry = new Issue_tool;
+	  $issue_entry = new Issue_tool;
 	  
-	  $issue_entry->user_id=session('user_id');
-	  $issue_entry->tool_id=$request->selected_tool;
-	  $issue_entry->dept_id=session('dept_id');
-	  $issue_entry->tool_qty=$request->selected_quantity;
-	  $issue_entry->shift_id=$request->selected_shnumber;
-	  $issue_entry->wrk_station_id=$request->selected_wrkst;
-	  $issue_entry->line_id=$request->selected_line;
-	  $issue_entry->product_id=$request->selected_product;
-	  $issue_entry->issue_date=Carbon::today();
-	  $issue_entry->save();
-	  
-	  $id=$issue_entry->id;
-	  
-	  $email_details = Issue_tool::find($id);
-		
-		$tool_issued = Tool::find($request->selected_tool);
-		
-		$tool_issued->available -= $request->selected_quantity;
-		$tool_issued->save();
+	  $bill_ids = array();
 
+
+		//Running loop for each selected Tools
+		foreach($request->selected_tool  as $key => $value) {
+			$id = DB::table('issues')->insertGetId(
+			  [		'user_id' => session('user_id'),
+					 'tool_id' => $value,
+					 'dept_id' => session('dept_id'),
+					 'tool_qty' => $request->tl_qty[$key],
+					 'shift_id' => $request->selected_shnumber,
+					 'wrk_station_id' => $request->selected_wrkst,
+					 'line_id' => $request->selected_line,
+					 'product_id' => $request->selected_product,
+					 'issue_date' => Carbon::today(),
+					  
+			  ]
+		  );
+
+		  array_push($bill_ids,$id);
+
+				$tool_issued = Tool::find($value);
+				$tool_issued->available -=  $request->tl_qty[$key];
+				$tool_issued->save();
+
+
+				$tool_mail = Tool::find($value);
+		
+				if($tool_mail->available < $tool_mail->tool_limit ){
+
+					$email_details = Issue_tool::find($id);
+					
+					$email_user = User::select('users.email as email')
+						->where('user_type','=','2') 
+						->join('users2dept', 'users2dept.user_id', '=', 'users.id')
+						->where('users2dept.dept_id','=',session('dept_id'))
+						->get();	
+							foreach($email_user as $current_user)
+							{
+									$email =$current_user->email;
+									\Mail::to($email)->queue(new BelowLimitTool($email_details));
+							}
+					
+				}	
+
+
+		}
+	  
+		
 		if($request->selected_product=='0')
 		{
 			if($request->selected_line=='0')
@@ -227,7 +266,7 @@ class ToolController extends Controller
 			->join('user_details', 'user_details.user_id', '=', 'issues.user_id')
 			->join('tools', 'tools.id', '=', 'issues.tool_id')
 			->join('workstations', 'workstations.id', '=','issues.wrk_station_id')
-			->where('issues.id','=',$id)
+			->whereIn('issues.id', $bill_ids)
 			->get();
 		}
 	    else
@@ -238,7 +277,7 @@ class ToolController extends Controller
 			->join('tools', 'tools.id', '=', 'issues.tool_id')
 			->join('workstations', 'workstations.id', '=','issues.wrk_station_id')
 			->join('lines', 'lines.id', '=','issues.line_id')
-			->where('issues.id','=',$id)
+			->whereIn('issues.id',$bill_ids)
 			->get();
 	    }
 		}
@@ -252,7 +291,7 @@ class ToolController extends Controller
 			->join('tools', 'tools.id', '=', 'issues.tool_id')
 			->join('workstations', 'workstations.id', '=','issues.wrk_station_id')
 			->join('products', 'products.id', '=','issues.product_id')
-			->where('issues.id','=',$id)
+			->whereIn('issues.id',$bill_ids)
 			->get();
 		}
 	    else
@@ -264,31 +303,11 @@ class ToolController extends Controller
 			->join('workstations', 'workstations.id', '=','issues.wrk_station_id')
 			->join('lines', 'lines.id', '=','issues.line_id')
 			->join('products', 'products.id', '=','issues.product_id')
-			->where('issues.id','=',$id)
+			->whereIn('issues.id', $bill_ids)
 			->get();
 	    }
 		}
 		
-		
-		
-			
-		$tool_mail = Tool::find($request->selected_tool);
-		
-		if($tool_mail->available < $tool_mail->tool_limit ){
-			
-			$email_user = User::select('users.email as email')
-			    ->where('user_type','=','2') 
-				->join('users2dept', 'users2dept.user_id', '=', 'users.id')
-				->where('users2dept.dept_id','=',session('dept_id'))
-				->get();	
-					foreach($email_user as $current_user)
-					{
-							$email =$current_user->email;
-							\Mail::to($email)->queue(new BelowLimitTool($email_details));
-					}
-			
-		}	
-
 		
 			return view('supervisor.issue_bill')->with('issue',$issue_bill);
 			

@@ -17,7 +17,7 @@
                 <div class="col-md-5">
                  <label for="sch_type" class="control-label">Tool Name*</label>
                             
-                           <input autocomplete="off" id="search_text" type="text" class="form-control" name="name" required autofocus>
+                           <input autocomplete="off" type="text" class="search_text form-control" name="name[]" required autofocus>
                           <input id="selected_tool" type="hidden"  name="selected_tool" value="">
                     </div>
 
@@ -25,7 +25,7 @@
                      <label for="start_date" class="control-label">Tool Quantity*</label>
 
                          
-                                <input autocomplete="off" id="tl_qty" type="text" class="form-control" name="tl_qty" required><br> 
+                                <input autocomplete="off" id="tl_qty" type="text" class="form-control" name="tl_qty[]" required><br> 
                    </div>
                  </div>
                </div>
@@ -139,7 +139,7 @@
  <script>
    $(document).ready(function() {
     src = "{{ route('searchajax') }}";
-     $("#search_text").autocomplete({
+     $(".search_text").autocomplete({
         source: function(request, response) {
             $.ajax({
                 url: src,
@@ -172,12 +172,11 @@
 	
 			 $('#reset').click(function()
 			{
-					$('#search_text').prop('disabled', false);
-						 $('#selected_tool').attr('value', ''); 
+					$('.search_text').prop('disabled', false);
 			});
 			
 			
-			 $('#search_text').change(function()
+			/*  $('#search_text').change(function()
 			{
 					 $value =  $('#search_text').val();
 					
@@ -194,14 +193,45 @@
 						  })
 						  
 	  
-			});
+			}); */
 
 
 $('#add').click(function(){
 
 
 
-$('#add_tool').append('<div class="col-md-12 remove"><div class="col-md-5"><label for="sch_type" class="control-label">Tool Name*</label><input autocomplete="off" id="search_text" type="text" class="form-control" name="name" required autofocus><input id="selected_tool" type="hidden"  name="selected_tool" value=""></div><div class="col-md-5"><label for="start_date" class="control-label">Tool Quantity*</label><input autocomplete="off" id="tl_qty" type="text" class="form-control" name="tl_qty" required></div><div class="col-md-2"><br><button type="button" class="btn btn-sm btn-danger del_btn">-</button></div></div>');
+$('#add_tool').append('<div class="col-md-12 remove"><div class="col-md-5"><label for="sch_type" class="control-label">Tool Name*</label><input autocomplete="off"  type="text" class="search_text form-control" name="name[]" required autofocus><input id="selected_tool" type="hidden"  name="selected_tool" value=""></div><div class="col-md-5"><label for="start_date" class="control-label">Tool Quantity*</label><input autocomplete="off" id="tl_qty" type="text" class="form-control" name="tl_qty[]" required></div><div class="col-md-2"><br><button type="button" class="btn btn-sm btn-danger del_btn">-</button></div></div>');
+
+ src = "{{ route('searchajax') }}";
+     $(".search_text").autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: src,
+                dataType: "json",
+                data: {
+                    term : request.term,
+					dept_id : {{ session('dept_id') }}
+                },
+                success: function(data) {
+                    response(data);
+					console.log(data);
+                             
+                }
+            });
+        },
+        minLength: 1,
+
+  
+	change: function (event, ui) {
+            if (ui.item == null || ui.item == undefined) {
+                $("#search_text").val("");
+                $("#search_text").attr("disabled", false);
+            } else {
+                $("#search_text").attr("disabled", false);
+            }
+        }
+       
+    })
 
 $('.del_btn').click(function(){
 $(this).parent().parent().remove();

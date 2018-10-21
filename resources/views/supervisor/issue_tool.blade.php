@@ -12,22 +12,22 @@
                         {{ csrf_field() }}
 
                      
-                         <div class="form-group">
-                            <label for="sch_type" class="col-md-4 control-label">Tool Name</label>
-                            <div class="col-md-6">
-                           <input autocomplete="off" id="search_text1" type="text" class="form-control" name="name" value="{{$toolname}}" disabled>
-                                <input  type="hidden"  name="selected_tool" value="{{$toolid}}">
+                        <div class="form-group" id="add_tool" >
+                            @foreach($toolname as $key => $value)
+                            <div class="col-md-12" style="margin-bottom: -18px;">
+                            <div class="col-md-5">
+                                <label for="sch_type" class="control-label">Tool Name*</label>
+                                        <input  type="text" class="search_text form-control" name="name[]" value="{{$value}}" readonly>
                                 </div>
-                        </div>
-                        
-                            <div class="form-group">
-                            <label for="start_date" class="col-md-4 control-label">Tool Quantity</label>
+                                <input type="hidden"  name="selected_tool[]" value="{{$toolid[$key]}}">
 
-                            <div class="col-md-6">
-                                <input autocomplete="off" id="tl_qty" type="text" class="form-control" name="tl_qty"  value="{{$quantity}}" disabled >
-                                <input  type="hidden"  name="selected_quantity" value="{{$quantity}}">
+                                    <div class="col-md-5">
+                                    <label for="start_date" class="control-label">Tool Quantity*</label>
+                                            <input autocomplete="off" id="tl_qty" type="text" class="form-control" readonly value="{{$quantity[$key]}}" name="tl_qty[]" ><br> 
+                                </div>
+                                </div>
+                                @endforeach
                             </div>
-                        </div>
 
                             <div class="form-group">
                             <label for="start_date" class="col-md-4 control-label">Shift Number</label>
